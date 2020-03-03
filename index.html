@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Platform Intro 2019</title>
+    <script src="Phaser/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script src='Js/game.js' type="text/javascript"></script>
+    <script src='Js/UIClasses.js' type="text/javascript"></script>
+    <script src='Js/UIScene.js' type="text/javascript"></script>
+
+    <script>
+        var config = {
+            type: Phaser.WEBGL,
+            width: 1280,
+            height: 720,
+            backgroundColor: '#000000',
+            pixelArt: true,
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH
+            },
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: {
+                        y: 0
+                    },
+                    debug: false
+                }
+            },
+
+            scene: [gameScene, UIScene]
+        };
+
+        var game = new Phaser.Game(config);
+    </script>
+</body>
+
+</html>
