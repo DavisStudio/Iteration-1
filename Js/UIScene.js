@@ -1,26 +1,29 @@
 class UIScene extends Phaser.Scene
 {
     fullScreenBut;
+    joyStickStick;
 
     constructor() 
     {
         super('UIScene')
     }
 
-    preload()
+    create()
     {
-        this.load.image("ss", "Sprites/UI/fullScreen.png");
+        this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
+        this.virtualJoyStick = new Phaser.Geom.Rectangle(10, 460, 250, 250);
+        this.graphics.strokeRectShape(this.virtualJoyStick);
+        
+        this.graphics.strokeEllipse(this.virtualJoyStick.centerX, this.virtualJoyStick.centerY, 10,10);
     }
 
     update()
     {
+
     }
 
-    createUIScene(sceneKey)
+    createUIScene()
     {
-        this.currentScene = this.scene.get(sceneKey);
-        this.scene.launch(this);
-
         this.makeFButton();
     }
 
@@ -28,9 +31,20 @@ class UIScene extends Phaser.Scene
     {
         console.log("fullSCRENbuttttttttttton");
         
-        this.fullScreenBut = new Button(this, config.width - 60, 10, "ss", function()
+        this.fullScreenBut = new Button(this, config.width - 75, 10, "fullScreenBtn", function()
         {
-            console.log("fullSCREN");
+            if(!this.scene.scale.isFullscreen)
+            {
+                this.scene.scale.startFullscreen();
+            }
+            else
+            {
+                this.scene.scale.stopFullscreen();   
+            }
+            
         });
+        this.fullScreenBut.scale = 2;
+
+        this.add.existing(this.fullScreenBut);
     }
 }

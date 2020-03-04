@@ -12,7 +12,7 @@ class gameScene extends Phaser.Scene
     preload()
     {
         this.load.image("playerImage", "Sprites/player.png");
-        this.load.image("ss", "Sprites/UI/fullScreen.png");
+        this.load.image("fullScreenBtn", "Sprites/UI/fullScreen.png");
     }
 
     create()
@@ -20,12 +20,10 @@ class gameScene extends Phaser.Scene
         this.fullScreen = false;
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        this.player = this.physics.add.sprite(50,50, "playerImage", 1);
+        this.player = this.physics.add.sprite(50,50, "playerImage");
 
         this.player.scale = 2;
         
-        this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
-        this.graphics.strokeRectShape(new Phaser.Geom.Rectangle(320, 200, 320, 200));
    
         this.UIScene = this.scene.get("UIScene");
         this.UIScene.createUIScene(this.scene.key);
