@@ -5,38 +5,37 @@ class gameScene extends Phaser.Scene
     fullScreen;
     UIScene;
 
-    constructor(key) {
-        super(key);
+    constructor() {
+        super("gameScene");
     }
 
     preload()
     {
-        this.load.image("playerImage", "../Sprites/player.png");
+        this.load.image("playerImage", "Sprites/player.png");
+        this.load.image("ss", "Sprites/UI/fullScreen.png");
     }
 
     create()
     {
         this.fullScreen = false;
         this.cursors = this.input.keyboard.createCursorKeys();
-        console.log(this.cursors);
 
         this.player = this.physics.add.sprite(50,50, "playerImage", 1);
-        console.log(this.player);
 
         this.player.scale = 2;
         
         this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
         this.graphics.strokeRectShape(new Phaser.Geom.Rectangle(320, 200, 320, 200));
    
-        this.UIScene = this.scene.manager.scenes[1];
-        this.UIScene.createUIScene();
+        this.UIScene = this.scene.get("UIScene");
+        this.UIScene.createUIScene(this.scene.key);
+        this.scene.launch(this.UIScene);
     }
 
     update()
     {
         if (!this.fullScreen)
         {
-            console.log("EnterFulscrreeen!");
         }
         else
         {
@@ -64,4 +63,5 @@ class gameScene extends Phaser.Scene
         }
     }
 }
+
 

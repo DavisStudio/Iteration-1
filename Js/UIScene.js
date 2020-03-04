@@ -1,18 +1,36 @@
 class UIScene extends Phaser.Scene
 {
+    fullScreenBut;
+
     constructor() 
     {
         super('UIScene')
     }
 
-    createUIScene()
+    preload()
     {
-        this.gameScene = gameScene;
-
-        this.scoreText = this.add.text(100, 100, "Score: 0", {
-            font: '40px Arial',
-            fill: '#ffffff'
-        }).setDepth(2);
+        this.load.image("ss", "Sprites/UI/fullScreen.png");
     }
 
+    update()
+    {
+    }
+
+    createUIScene(sceneKey)
+    {
+        this.currentScene = this.scene.get(sceneKey);
+        this.scene.launch(this);
+
+        this.makeFButton();
+    }
+
+    makeFButton()
+    {
+        console.log("fullSCRENbuttttttttttton");
+        
+        this.fullScreenBut = new Button(this, config.width - 60, 10, "ss", function()
+        {
+            console.log("fullSCREN");
+        });
+    }
 }
