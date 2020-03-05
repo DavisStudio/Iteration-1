@@ -86,18 +86,14 @@ class UIScene extends Phaser.Scene
 
                 this.joyStickStick.x = pointer.x;
                 this.joyStickStick.y = pointer.y;
+                
+                this.getMoveVectors();
             } 
             else if(this.virtualJoyStickBounds.contains(pointer.x, pointer.y))
             {
                 pointerOnJoyStick = i;
 
-                var xDiff = pointer.x - this.virtualJoyStick.x;
-                var yDiff = pointer.y - this.virtualJoyStick.y;
-
-                angleToTouch = Math.atan2(yDiff, xDiff);
-                
-                this.joyStickStick.x = this.virtualJoyStick.x + Math.cos(angleToTouch) * this.virtualJoyStick.width / 2;
-                this.joyStickStick.y = this.virtualJoyStick.y + Math.sin(angleToTouch) * this.virtualJoyStick.height / 2;
+                this.getMoveVectors();
             }
         }
 
@@ -136,6 +132,17 @@ class UIScene extends Phaser.Scene
         var gameScene = this.scene.manager.scenes[0];
         gameScene.playerMovementVector.x = moveX;
         gameScene.playerMovementVector.y = moveY;
+    }
+
+    getMoveVectors()
+    {
+        var xDiff = pointer.x - this.virtualJoyStick.x;
+        var yDiff = pointer.y - this.virtualJoyStick.y;
+
+        angleToTouch = Math.atan2(yDiff, xDiff);
+        
+        this.joyStickStick.x = this.virtualJoyStick.x + Math.cos(angleToTouch) * this.virtualJoyStick.width / 2;
+        this.joyStickStick.y = this.virtualJoyStick.y + Math.sin(angleToTouch) * this.virtualJoyStick.height / 2;
     }
 
     radToDeg(rad)
