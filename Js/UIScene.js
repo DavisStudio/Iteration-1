@@ -21,8 +21,8 @@ class UIScene extends Phaser.Scene
     create()
     {
         this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
-        this.virtualJoyStick = new Phaser.Geom.Ellipse(180, 550, 180, 180);
-        this.virtualJoyStickBounds = new Phaser.Geom.Ellipse(180, 550, 470, 470);
+        this.virtualJoyStick = new Phaser.Geom.Ellipse(230, 550, 180, 180);
+        this.virtualJoyStickBounds = new Phaser.Geom.Ellipse(230, 550, 470, 470);
         this.graphics.strokeEllipseShape(this.virtualJoyStick);
         this.graphics.strokeEllipseShape(this.virtualJoyStickBounds);
         
@@ -39,9 +39,43 @@ class UIScene extends Phaser.Scene
 
     update()
     {
+        this.virtualJoystickCheck();
+    }
+
+    createUIScene()
+    {
+        this.makeFButton();
+    }
+
+    makeFButton()
+    {
+        console.log("fullSCRENbuttttttttttton");
+        
+        this.fullScreenBut = new Button(this, config.width - 75, 10, "fullScreenBtn", function()
+        {
+            if(!this.scene.scale.isFullscreen)
+            {
+                this.scene.scale.startFullscreen();
+            }
+            else
+            {
+                this.scene.scale.stopFullscreen();   
+            }
+            
+        });
+        this.fullScreenBut.scale = 2;
+
+        this.add.existing(this.fullScreenBut);
+    }
+
+    virtualJoystickCheck()
+    {
         var pointerList = this.scene.scene.input.manager.pointers;
         var pointerOnJoyStick = 999;
         var angleToTouch = 0;
+
+        var moveX;
+        var moveY;
 
         for(var i = 0; i < pointerList.length;i++)
         {
@@ -72,43 +106,36 @@ class UIScene extends Phaser.Scene
             var isDownCheck = pointerList[pointerOnJoyStick].isDown;
             var pointer = pointerList[pointerOnJoyStick];
         
-            if (false == isDownCheck)
+            if (!isDownCheck)
             {
                 this.joyStickStick.x = this.virtualJoyStick.x;
                 this.joyStickStick.y = this.virtualJoyStick.y;
+                
+                moveX = 0;
+                moveY = 0;
+            }
+            else
+            {
+                moveX = (Math.cos(angleToTouch) * this.virtualJoyStick.width / 2) / (this.virtualJoyStick.width / 2);
+                moveY = (Math.sin(angleToTouch) * this.virtualJoyStick.height / 2) / (this.virtualJoyStick.height / 2)
             }
         }
         else
         {
             this.joyStickStick.x = this.virtualJoyStick.x;
             this.joyStickStick.y = this.virtualJoyStick.y;
+
+            moveX = 0;
+            moveY = 0;
         }
-    }
 
-    createUIScene()
-    {
-        this.makeFButton();
-    }
-
-    makeFButton()
-    {
-        console.log("fullSCRENbuttttttttttton");
+       // moveX = (Math.cos(angleToTouch) * this.virtualJoyStick.width / 2) / (this.virtualJoyStick.width / 2);
+       // moveY = (Math.sin(angleToTouch) * this.virtualJoyStick.height / 2) / (this.virtualJoyStick.height / 2)
+        //console.log("X pos: " + moveX + "| Y pos: " + moveY);
         
-        this.fullScreenBut = new Button(this, config.width - 75, 10, "fullScreenBtn", function()
-        {
-            if(!this.scene.scale.isFullscreen)
-            {
-                this.scene.scale.startFullscreen();
-            }
-            else
-            {
-                this.scene.scale.stopFullscreen();   
-            }
-            
-        });
-        this.fullScreenBut.scale = 2;
-
-        this.add.existing(this.fullScreenBut);
+        var gameScene = this.scene.manager.scenes[0];
+        gameScene.playerMovementVector.x = moveX;
+        gameScene.playerMovementVector.y = moveY;
     }
 
     radToDeg(rad)
