@@ -4,6 +4,8 @@ class UIScene extends Phaser.Scene
     joyStickStick;
     underJoyStick;
     pointerList;
+    virtualJoyStick;
+    virtualJoyStickBounds;
 
     constructor() 
     {
@@ -19,23 +21,68 @@ class UIScene extends Phaser.Scene
     create()
     {
         this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
-        this.virtualJoyStick = new Phaser.Geom.Rectangle(10, 460, 250, 250);
-        this.graphics.strokeRectShape(this.virtualJoyStick);
+        this.virtualJoyStick = new Phaser.Geom.Ellipse(180, 550, 180, 180);
+        this.virtualJoyStickBounds = new Phaser.Geom.Ellipse(180, 550, 470, 470);
+        this.graphics.strokeEllipseShape(this.virtualJoyStick);
+        this.graphics.strokeEllipseShape(this.virtualJoyStickBounds);
         
-        this.underJoyStick = this.physics.add.sprite(this.virtualJoyStick.centerX, this.virtualJoyStick.centerY, "underJoyStick");
+        console.log(this.virtualJoyStick);
+
+        this.underJoyStick = this.physics.add.sprite(this.virtualJoyStick.x, this.virtualJoyStick.y, "underJoyStick");
         this.underJoyStick.scale = 4;
-        this.joyStickStick = this.physics.add.sprite(this.virtualJoyStick.centerX, this.virtualJoyStick.centerY, "joyStick");
+        this.joyStickStick = this.physics.add.sprite(this.virtualJoyStick.x, this.virtualJoyStick.y, "joyStick");
         this.joyStickStick.scale = 6;
-        this.graphics.strokeEllipse(this.virtualJoyStick.centerX, this.virtualJoyStick.centerY, 10,10);
+        this.graphics.strokeEllipse(this.virtualJoyStick.x, this.virtualJoyStick.y, 10,10);
         
         this.pointerList = [];
     }
 
     update()
     {
-       // this.pointerList = this.scene.scene.input.manager.touch.manager.pointers;
-        //console.log(this.scene.scene.input.manager.touch);
-        console.log(this.pointerList);
+        var pointerList = this.scene.scene.input.manager.pointers;
+        var pointerOnJoyStick = 999;
+        var angleToTouch = 0;
+
+        for(var i = 0; i < pointerList.length;i++)
+        {
+            var pointer = pointerList[i];
+            if(this.virtualJoyStick.contains(pointer.x, pointer.y))
+            {
+                pointerOnJoyStick = i;
+
+                this.joyStickStick.x = pointer.x;
+                this.joyStickStick.y = pointer.y;
+            } 
+            else if(this.virtualJoyStickBounds.contains(pointer.x, pointer.y))
+            {
+                pointerOnJoyStick = i;
+
+                var xDiff = pointer.x - this.virtualJoyStick.x;
+                var yDiff = pointer.y - this.virtualJoyStick.y;
+
+                angleToTouch = Math.atan2(yDiff, xDiff);
+                
+                this.joyStickStick.x = this.virtualJoyStick.x + Math.cos(angleToTouch) * this.virtualJoyStick.width / 2;
+                this.joyStickStick.y = this.virtualJoyStick.y + Math.sin(angleToTouch) * this.virtualJoyStick.height / 2;
+            }
+        }
+
+        if (pointerList[pointerOnJoyStick])
+        {
+            var isDownCheck = pointerList[pointerOnJoyStick].isDown;
+            var pointer = pointerList[pointerOnJoyStick];
+        
+            if (false == isDownCheck)
+            {
+                this.joyStickStick.x = this.virtualJoyStick.x;
+                this.joyStickStick.y = this.virtualJoyStick.y;
+            }
+        }
+        else
+        {
+            this.joyStickStick.x = this.virtualJoyStick.x;
+            this.joyStickStick.y = this.virtualJoyStick.y;
+        }
     }
 
     createUIScene()
@@ -62,5 +109,15 @@ class UIScene extends Phaser.Scene
         this.fullScreenBut.scale = 2;
 
         this.add.existing(this.fullScreenBut);
+    }
+
+    radToDeg(rad)
+    {
+        return rad * 180/Math.PI;
+    }
+
+    radToDeg(deg)
+    {
+        return deg * Math.PI/180;
     }
 }
