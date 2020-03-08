@@ -18,11 +18,10 @@ class Building extends Phaser.GameObjects.Sprite
         this.building.setDepth(-5);
 
         this.initialBoundBox(x,y,width,height,location);
-        
-        console.log(scene);
+
+        this.lastFrame = 0;
+
         scene.add.existing(this.building);
-        
-        
     }
 
     initialBoundBox(x, y, width, height, location)

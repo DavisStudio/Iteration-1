@@ -82,18 +82,26 @@ class gameScene extends Phaser.Scene
                 {
                     //let x = i % 10;
                    // let y = Math.floor(i / 10);
-                    
-                    let building = this.buildingLocations[i];
-                    let boundBox = building.boundBox;
-                    if(boundBox.contains(this.player.x, this.player.y))
+
+                let building = this.buildingLocations[i];
+                let boundBox = building.boundBox;
+                if (boundBox.contains(this.player.x, this.player.y))
+                {
+                    this.posSelected = i;
+
+                    console.log();
+                    building.building.anims.play("handGenAnim", true, building.lastFrame);
+                } 
+                else
+                {
+                    if(building.building.anims.currentFrame)
                     {
-                        this.posSelected = i;
-                        building.building.setTint(102800);
-                    }else
-                    {
-                        building.building.clearTint();
+                        console.log(building.building.anims.currentFrame.index);
+                        building.lastFrame = building.building.anims.currentFrame.index;
                     }
+                    building.building.anims.stop("handGenAnim");
                 }
+            }
         }
     }
 
@@ -109,7 +117,7 @@ class gameScene extends Phaser.Scene
             {
                 this.buildingLocations[x + (y * 10)] = new Building(this, x * bc.horizontalMargin - ((bc.horizontalMargin + bc.buildWidth) * bc.gridWidth / 2),
                 y * bc.horizontalMargin - ((bc.verticalMargin + bc.buildHeight) * bc.gridHeight / 2),
-                bc.buildWidth, bc.buildHeight, "handGenAnim", {x: x, y: y});
+                bc.buildWidth, bc.buildHeight, "handGen", {x: x, y: y});
             }
         }
     }
@@ -123,7 +131,8 @@ class gameScene extends Phaser.Scene
                 end: 5,
                 first: 0
             }),
-            frameRate: 10
+            frameRate: 10,
+            repeat: -1
         })
     }
 }
