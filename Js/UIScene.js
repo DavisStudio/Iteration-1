@@ -26,8 +26,6 @@ class UIScene extends Phaser.Scene
         this.graphics.strokeEllipseShape(this.virtualJoyStick);
         this.graphics.strokeEllipseShape(this.virtualJoyStickBounds);
 
-        console.log(this.virtualJoyStick);
-
         this.underJoyStick = this.physics.add.sprite(this.virtualJoyStick.x, this.virtualJoyStick.y, "underJoyStick");
         this.underJoyStick.scale = 4;
         this.joyStickStick = this.physics.add.sprite(this.virtualJoyStick.x, this.virtualJoyStick.y, "joyStick");
