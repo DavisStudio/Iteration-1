@@ -6,6 +6,10 @@ class UIScene extends Phaser.Scene
     pointerList;
     virtualJoyStick;
     virtualJoyStickBounds;
+    
+    moneyBarUI;
+    moneyUIIcon;
+    moneyText;
 
     constructor() 
     {
@@ -16,6 +20,9 @@ class UIScene extends Phaser.Scene
     {
         this.load.image("underJoyStick", "Sprites/UI/underJoyStick.png");
         this.load.image("joyStick", "Sprites/UI/joyStick.png");
+
+        this.load.image("moneyBarUI", "Sprites/UI/moneyUI.png");
+        this.load.image("electricIconUI", "Sprites/UI/electric.png");
     }
 
     create()
@@ -31,6 +38,18 @@ class UIScene extends Phaser.Scene
         this.joyStickStick = this.physics.add.sprite(this.virtualJoyStick.x, this.virtualJoyStick.y, "joyStick");
         this.joyStickStick.scale = 6;
         this.graphics.strokeEllipse(this.virtualJoyStick.x, this.virtualJoyStick.y, 10, 10);
+        
+        this.moneyBarUI = this.add.existing(new Phaser.GameObjects.Sprite(this, config.width / 2, 40, "moneyBarUI"));
+        this.moneyBarUI.scale = 2;
+
+        this.moneyText = this.add.text(this.moneyBarUI.x, 35, "1000900", {
+            font: '40px Changa',
+            fill: '#ffffff',
+            align: "center"
+        });
+        this.moneyText.setOrigin(0.5,0.5);
+
+        this.electricIconUI = this.add.existing(new Phaser.GameObjects.Sprite(this, config.width / 2, 37, "electricIconUI"));
 
         this.pointerList = [];
     }
@@ -145,13 +164,22 @@ class UIScene extends Phaser.Scene
         gameScene.playerMovementVector.y = moveY;
     }
 
-radToDeg(rad)
-{
-    return rad * 180 / Math.PI;
-}
+    updateMoney(money)
+    {
+        if(this.moneyText)
+        {
+            this.moneyText.text = money;
+            this.electricIconUI.x = this.moneyText.x + this.moneyText.width / 2 + 10;
+        }
+    }
 
-radToDeg(deg)
-{
-    return deg * Math.PI / 180;
-}
+    radToDeg(rad)
+    {
+        return rad * 180 / Math.PI;
+    }
+
+    radToDeg(deg)
+    {
+        return deg * Math.PI / 180;
+    }
 }

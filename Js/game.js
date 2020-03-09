@@ -13,6 +13,8 @@ class gameScene extends Phaser.Scene
     posSelected;
     anims;
 
+    totalIncomePerTick;
+
     constructor() {
         super("gameScene");
     }
@@ -21,10 +23,11 @@ class gameScene extends Phaser.Scene
     {
         this.load.image("playerImage", "Sprites/player.png");
         this.load.image("fullScreenBtn", "Sprites/UI/fullScreen.png");
-        this.load.image("backGroundGrass", "Sprites/TileSets/backGround.png");
-        this.load.image("buildSpace", "Sprites/TileSets/sand.png");
 
-        this.load.spritesheet("handGen", "/Sprites/Machines/handGenerator.png", 
+        this.load.image("backGroundGrass", "Sprites/TileSets/backGround.png");
+        
+        this.load.image("buildSpace", "Sprites/TileSets/sand.png");
+        this.load.spritesheet("handGen", "Sprites/Machines/handGenerator.png", 
         {
             frameWidth: 100,
             frameHeight: 100
@@ -42,6 +45,7 @@ class gameScene extends Phaser.Scene
         this.background.setDepth(-10);
 
         this.player = this.physics.add.sprite(50,50, "playerImage");
+        this.player.money = 0;
 
         this.player.scale = 2;
         this.playerSpeed = 300;   
@@ -63,6 +67,8 @@ class gameScene extends Phaser.Scene
             verticalMargin: 400
         };
 
+        this.totalIncomePerTick = 0;
+
         this.createAnims();
         this.drawBuildGrid();
     }
@@ -74,7 +80,15 @@ class gameScene extends Phaser.Scene
             console.log("Enter FullScreen");
         }
         else
-        {
+        {   
+               
+                if(this.sys.time.now)
+                {
+                    console.log(this.totalIncomePerTick);
+                    this.player.money += this.totalIncomePerTick;
+                    this.UIScene.updateMoney(this.player.money);
+                }
+
                 this.player.setVelocityX(this.playerMovementVector.x * this.playerSpeed);
                 this.player.setVelocityY(this.playerMovementVector.y * this.playerSpeed);
 
@@ -88,18 +102,27 @@ class gameScene extends Phaser.Scene
                 if (boundBox.contains(this.player.x, this.player.y))
                 {
                     this.posSelected = i;
-
-                    console.log();
+                    if(!building.incomeAdded)
+                    {
+                        building.incomeAdded = true;
+                        this.totalIncomePerTick += building.incomePerTick;
+                    }
+                    
                     building.building.anims.play("handGenAnim", true, building.lastFrame);
                 } 
                 else
                 {
                     if(building.building.anims.currentFrame)
                     {
-                        console.log(building.building.anims.currentFrame.index);
                         building.lastFrame = building.building.anims.currentFrame.index;
                     }
                     building.building.anims.stop("handGenAnim");
+
+                    if(building.incomeAdded)
+                    {
+                        building.incomeAdded = false;
+                        this.totalIncomePerTick -best an= building.incomePerTick;
+                    }
                 }
             }
         }
@@ -115,7 +138,7 @@ class gameScene extends Phaser.Scene
         {
             for (var y = 0; y < 10; y++)
             {
-                this.buildingLocations[x + (y * 10)] = new Building(this, x * bc.horizontalMargin - ((bc.horizontalMargin + bc.buildWidth) * bc.gridWidth / 2),
+                this.buildingLocations[x + (y * 10)] = new HandGenerator(this, x * bc.horizontalMargin - ((bc.horizontalMargin + bc.buildWidth) * bc.gridWidth / 2),
                 y * bc.horizontalMargin - ((bc.verticalMargin + bc.buildHeight) * bc.gridHeight / 2),
                 bc.buildWidth, bc.buildHeight, "handGen", {x: x, y: y});
             }
