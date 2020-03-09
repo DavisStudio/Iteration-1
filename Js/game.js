@@ -12,6 +12,7 @@ class gameScene extends Phaser.Scene
     buildingLocations;
     posSelected;
     anims;
+    keyboardKeys;
 
     totalIncomePerTick;
 
@@ -32,6 +33,13 @@ class gameScene extends Phaser.Scene
             frameWidth: 100,
             frameHeight: 100
         });
+        this.load.spritesheet("solarPanel", "Sprites/Machines/solarPanel.png", 
+        {
+            frameWidth: 100,
+            frameHeight: 100
+        });
+
+        this.load.image("menuBackground", "Sprites/UI/menuBackground.png");
     }
 
     create()
@@ -45,7 +53,6 @@ class gameScene extends Phaser.Scene
         this.background.setDepth(-10);
 
         this.player = this.physics.add.sprite(50,50, "playerImage");
-        this.player.money = 0;
 
         this.player.scale = 2;
         this.playerSpeed = 300;   
@@ -59,8 +66,8 @@ class gameScene extends Phaser.Scene
         this.cameras.main.startFollow(this.player, true, 0.5, 0.5);
         
         this.buildConfig = {
-            gridWidth: 10,
-            gridHeight: 10,
+            gridWidth: 5,
+            gridHeight: 5,
             buildWidth: 180,
             buildHeight: 180,
             horizontalMargin: 400,
@@ -68,6 +75,12 @@ class gameScene extends Phaser.Scene
         };
 
         this.totalIncomePerTick = 0;
+
+        this.keyboardKeys = this.input.keyboard.createCursorKeys();
+
+        this.player.money = 0
+        this.totalIncomePerTick = 0;
+        let timedEvent = this.time.addEvent({ delay: 800, callback: this.addMoney, callbackScope: this, repeat: -1 });
 
         this.createAnims();
         this.drawBuildGrid();
@@ -81,14 +94,6 @@ class gameScene extends Phaser.Scene
         }
         else
         {   
-               
-                if(this.sys.time.now)
-                {
-                    console.log(this.totalIncomePerTick);
-                    this.player.money += this.totalIncomePerTick;
-                    this.UIScene.updateMoney(this.player.money);
-                }
-
                 this.player.setVelocityX(this.playerMovementVector.x * this.playerSpeed);
                 this.player.setVelocityY(this.playerMovementVector.y * this.playerSpeed);
 
@@ -102,27 +107,41 @@ class gameScene extends Phaser.Scene
                 if (boundBox.contains(this.player.x, this.player.y))
                 {
                     this.posSelected = i;
-                    if(!building.incomeAdded)
+            
+                    if (building.available)
                     {
-                        building.incomeAdded = true;
-                        this.totalIncomePerTick += building.incomePerTick;
+                        building.buyMenu.setVisible(true);
+                        if (this.keyboardKeys.space.isDown)
+                        {
+                            console.log("Purchase");
+                            building.available = false; 
+                            building.buyMenu.destroy();
+                            this.buildingLocations[i] = new SolarPanel(this,building.building.x, building.building.y, building.building.width, building.building.height, i).setDepth(10);
+                            building.destroy();
+                        }
+
+                        if(this.keyboardKeys.down.isDown)
+                        {
+                            console.log(this.buildingLocations[i]);
+                        }
+                    }
+                    else
+                    {
+                        console.log("this is already sold");
                     }
                     
-                    building.building.anims.play("handGenAnim", true, building.lastFrame);
+                    building.building.anims.play(building.animationString, true, building.lastFrame);
+                    
                 } 
                 else
                 {
+                    building.buyMenu.setVisible(false);
+                    
                     if(building.building.anims.currentFrame)
                     {
                         building.lastFrame = building.building.anims.currentFrame.index;
                     }
-                    building.building.anims.stop("handGenAnim");
-
-                    if(building.incomeAdded)
-                    {
-                        building.incomeAdded = false;
-                        this.totalIncomePerTick -best an= building.incomePerTick;
-                    }
+                    building.building.anims.stop(building.animationString);
                 }
             }
         }
@@ -138,9 +157,9 @@ class gameScene extends Phaser.Scene
         {
             for (var y = 0; y < 10; y++)
             {
-                this.buildingLocations[x + (y * 10)] = new HandGenerator(this, x * bc.horizontalMargin - ((bc.horizontalMargin + bc.buildWidth) * bc.gridWidth / 2),
+                this.buildingLocations[x + (y * 10)] = new Building(this, x * bc.horizontalMargin - ((bc.horizontalMargin + bc.buildWidth) * bc.gridWidth / 2),
                 y * bc.horizontalMargin - ((bc.verticalMargin + bc.buildHeight) * bc.gridHeight / 2),
-                bc.buildWidth, bc.buildHeight, "handGen", {x: x, y: y});
+                bc.buildWidth, bc.buildHeight, {x: x, y: y}, "buildSpace");
             }
         }
     }
@@ -156,7 +175,35 @@ class gameScene extends Phaser.Scene
             }),
             frameRate: 10,
             repeat: -1
-        })
+        });
+
+        this.anims.create({
+            key: 'solarPanelAnim',
+            frames: this.anims.generateFrameNumbers('solarPanel', {
+                start: 0,
+                end: 5,
+                first: 0
+            }),
+            frameRate: 10,
+            repeat: -1
+        });
+    }
+
+    newHandGenerator()
+    {
+
+    }
+
+    newSolarPanel()
+    {
+
+    }
+
+    // Runs per tick
+    addMoney()
+    {
+        this.player.money += this.totalIncomePerTick;
+        this.UIScene.updateMoney(this.player.money);
     }
 }
 

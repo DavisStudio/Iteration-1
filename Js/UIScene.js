@@ -42,15 +42,15 @@ class UIScene extends Phaser.Scene
         this.moneyBarUI = this.add.existing(new Phaser.GameObjects.Sprite(this, config.width / 2, 40, "moneyBarUI"));
         this.moneyBarUI.scale = 2;
 
-        this.moneyText = this.add.text(this.moneyBarUI.x, 35, "1000900", {
+        this.moneyText = this.add.text(this.moneyBarUI.x, 35, "0", {
             font: '40px Changa',
             fill: '#ffffff',
             align: "center"
         });
         this.moneyText.setOrigin(0.5,0.5);
 
-        this.electricIconUI = this.add.existing(new Phaser.GameObjects.Sprite(this, config.width / 2, 37, "electricIconUI"));
-
+        this.electricIconUI = this.add.existing(new Phaser.GameObjects.Sprite(this, config.width / 2 + 15, 37, "electricIconUI"));
+        
         this.pointerList = [];
     }
 
