@@ -23,7 +23,7 @@ class WindTurbine extends Building
 
     updateUpgrade()
     {
-        if(this.gameScene.managerPrices.WindTurbine < this.gameScene.currencyManager.money)
+        if(this.gameScene.managerPrices.windTurbine < this.gameScene.currencyManager.money && !this.hasManager)
         {
             this.managerBut.enableButton();
         }

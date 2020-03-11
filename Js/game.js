@@ -67,7 +67,7 @@ class gameScene extends Phaser.Scene
         {
             handGen: 100,
             solarPanel: 4500,
-            windTurbine: 30000
+            windTurbine: 22000
         }
 
         this.graphics = this.add.graphics({ lineStyle: { width: 0, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });

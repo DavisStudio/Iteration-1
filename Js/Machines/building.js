@@ -116,7 +116,7 @@ class Building extends Phaser.GameObjects.Sprite
                 building.available = false; 
                 building.buyMenu.destroy();
 
-                gameScene.machinePrice.handGen = Math.floor(1.3 * gameScene.machinePrice.handGen);
+                gameScene.machinePrice.handGen = Math.floor(1.25 * gameScene.machinePrice.handGen);
                 gameScene.currencyManager.money -= gameScene.machinePrice.handGen;
 
                 gameScene.buildingLocations[gameScene.posSelected] = new HandGenerator(gameScene, building.building.x, building.building.y, 
@@ -133,7 +133,7 @@ class Building extends Phaser.GameObjects.Sprite
                 building.available = false; 
                 building.buyMenu.destroy();
 
-                gameScene.machinePrice.solarPanel = Math.floor(1.4 * gameScene.machinePrice.solarPanel);
+                gameScene.machinePrice.solarPanel = Math.floor(1.25 * gameScene.machinePrice.solarPanel);
                 gameScene.currencyManager.money -= gameScene.machinePrice.solarPanel;
 
                 gameScene.buildingLocations[gameScene.posSelected] = new SolarPanel(gameScene, building.building.x, building.building.y, 
@@ -149,7 +149,7 @@ class Building extends Phaser.GameObjects.Sprite
                 building.available = false; 
                 building.buyMenu.destroy();
 
-                gameScene.machinePrice.windTurbine = Math.floor(1.3 * gameScene.machinePrice.windTurbine);
+                gameScene.machinePrice.windTurbine = Math.floor(1.25 * gameScene.machinePrice.windTurbine);
                 gameScene.currencyManager.money -= gameScene.machinePrice.windTurbine;
 
                 gameScene.buildingLocations[gameScene.posSelected] = new WindTurbine(gameScene, building.building.x, building.building.y, 

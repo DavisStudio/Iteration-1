@@ -22,7 +22,7 @@ class SolarPanel extends Building
     
     updateUpgrade()
     {
-        if(this.gameScene.managerPrices.solarPanel < this.gameScene.currencyManager.money)
+        if(this.gameScene.managerPrices.solarPanel < this.gameScene.currencyManager.money && !this.hasManager)
         {
             this.managerBut.enableButton();
         }

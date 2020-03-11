@@ -23,7 +23,7 @@ class HandGenerator extends Building
 
     updateUpgrade()
     {
-        if(this.gameScene.managerPrices.handGen < this.gameScene.currencyManager.money)
+        if(this.gameScene.managerPrices.handGen < this.gameScene.currencyManager.money && !this.hasManager)
         {
             this.managerBut.enableButton();
         }
