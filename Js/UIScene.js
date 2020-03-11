@@ -27,7 +27,7 @@ class UIScene extends Phaser.Scene
 
     create()
     {
-        this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
+        this.graphics = this.add.graphics({ lineStyle: { width: 0, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
         this.virtualJoyStick = new Phaser.Geom.Ellipse(230, 550, 80, 80);
         this.virtualJoyStickBounds = new Phaser.Geom.Ellipse(230, 550, 470, 470);
         this.graphics.strokeEllipseShape(this.virtualJoyStick);

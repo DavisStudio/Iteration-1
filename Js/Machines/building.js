@@ -56,7 +56,7 @@ class Building extends Phaser.GameObjects.Sprite
 
     initialBoundBox(x, y, width, height, location)
     {
-        this.graphics = this.scene.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
+        this.graphics = this.scene.add.graphics({ lineStyle: { width: 0, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
         
         this.boundBox = (new Phaser.Geom.Rectangle(x, y, width, height));
         this.graphics.strokeRectShape(this.boundBox);
