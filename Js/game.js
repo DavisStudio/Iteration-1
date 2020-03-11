@@ -1,5 +1,3 @@
-
-
 class gameScene extends Phaser.Scene 
 {
     player;
@@ -14,7 +12,9 @@ class gameScene extends Phaser.Scene
     anims;
     keyboardKeys;
 
+    currentMachines;
     totalIncomePerTick;
+    machinePrice;
 
     constructor() {
         super("gameScene");
@@ -28,6 +28,7 @@ class gameScene extends Phaser.Scene
         this.load.image("backGroundGrass", "Sprites/TileSets/backGround.png");
         
         this.load.image("buildSpace", "Sprites/TileSets/sand.png");
+        
         this.load.spritesheet("handGen", "Sprites/Machines/handGenerator.png", 
         {
             frameWidth: 100,
@@ -38,12 +39,29 @@ class gameScene extends Phaser.Scene
             frameWidth: 100,
             frameHeight: 100
         });
+        this.load.spritesheet("windTurbine", "Sprites/Machines/windTurbine.png", 
+        {
+            frameWidth: 100,
+            frameHeight: 100
+        });
 
         this.load.image("menuBackground", "Sprites/UI/menuBackground.png");
+        this.load.image("button", "Sprites/UI/button.png");
+        this.load.image("buttonDown", "Sprites/UI/button-Pressed.png");
+        this.load.image("buttonRed", "Sprites/UI/button-red.png");
     }
 
     create()
     {
+        this.machinePrice = 
+        {
+            handGen: 6,
+            solarPanel: 25,
+            windTurbine: 100,
+            geoTer: 500,
+            nuclearPlant: 1000
+        };
+
         this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
         this.fullScreen = true;
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -70,8 +88,8 @@ class gameScene extends Phaser.Scene
             gridHeight: 5,
             buildWidth: 180,
             buildHeight: 180,
-            horizontalMargin: 400,
-            verticalMargin: 400
+            horizontalMargin: 330,
+            verticalMargin: 330
         };
 
         this.totalIncomePerTick = 0;
@@ -107,27 +125,17 @@ class gameScene extends Phaser.Scene
                 if (boundBox.contains(this.player.x, this.player.y))
                 {
                     this.posSelected = i;
-            
+
+                    // IF THE PLACE IS A BUILD SPOT 
                     if (building.available)
                     {
+                        building.updatePrices();
                         building.buyMenu.setVisible(true);
-                        if (this.keyboardKeys.space.isDown)
-                        {
-                            console.log("Purchase");
-                            building.available = false; 
-                            building.buyMenu.destroy();
-                            this.buildingLocations[i] = new SolarPanel(this,building.building.x, building.building.y, building.building.width, building.building.height, i).setDepth(10);
-                            building.destroy();
-                        }
-
-                        if(this.keyboardKeys.down.isDown)
-                        {
-                            console.log(this.buildingLocations[i]);
-                        }
                     }
-                    else
+                    else // IF THE PLACE IS ANY BUILDING
                     {
-                        console.log("this is already sold");
+
+                        building.upgradeMenu.setVisible(true);
                     }
                     
                     building.building.anims.play(building.animationString, true, building.lastFrame);
@@ -136,12 +144,21 @@ class gameScene extends Phaser.Scene
                 else
                 {
                     building.buyMenu.setVisible(false);
+
+                    if(building.upgradeMenu)
+                    {
+                        building.upgradeMenu.setVisible(false);
+                    }
                     
                     if(building.building.anims.currentFrame)
                     {
                         building.lastFrame = building.building.anims.currentFrame.index;
                     }
-                    building.building.anims.stop(building.animationString);
+
+                    if(!building.hasManager)
+                    {
+                        building.building.anims.stop(building.animationString);
+                    }
                 }
             }
         }
@@ -187,16 +204,17 @@ class gameScene extends Phaser.Scene
             frameRate: 10,
             repeat: -1
         });
-    }
 
-    newHandGenerator()
-    {
-
-    }
-
-    newSolarPanel()
-    {
-
+        this.anims.create({
+            key: 'windTurbineAnim',
+            frames: this.anims.generateFrameNumbers('windTurbine', {
+                start: 0,
+                end: 5,
+                first: 0
+            }),
+            frameRate: 10,
+            repeat: -1
+        });
     }
 
     // Runs per tick

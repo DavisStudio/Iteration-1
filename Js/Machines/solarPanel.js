@@ -12,5 +12,7 @@ class SolarPanel extends Building
 
         this.scene.totalIncomePerTick += this.incomePerTick;
 
+        this.setUpUpgradeMenu();
     }
+
 }

@@ -32,7 +32,7 @@ class Button extends Phaser.GameObjects.Sprite {
         //Set whether the Button is enabled. If it's not, make it appear disabled by greying it out.
         this.enabled = enabled;
         if(!this.enabled) {
-            this.setTint(0x5f5f5f);
+            this.setTint(0x646e6d);
         }
 
         //This event fires when the mouse gets released whilst over the sprite.
@@ -56,7 +56,7 @@ class Button extends Phaser.GameObjects.Sprite {
         this.on("pointerdown", function(pointer) {
             if(this.enabled){
                 pointer.lastBtn = this;
-                this.setTint(0x00ffff);
+                this.setTint(0xffffff);
             }
         });
     }

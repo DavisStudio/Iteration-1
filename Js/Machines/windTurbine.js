@@ -1,4 +1,4 @@
-class HandGenerator extends Building
+class WindTurbine extends Building
 {
     constructor(scene, x, y, width, height, location)
     {
@@ -14,6 +14,6 @@ class HandGenerator extends Building
         this.scene.totalIncomePerTick += this.incomePerTick;
 
         this.setUpUpgradeMenu();
-        this.animationString = "handGenAnim";
+        this.animationString = "windTurbineAnim";
     }
 }
