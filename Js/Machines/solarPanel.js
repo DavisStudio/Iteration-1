@@ -4,15 +4,33 @@ class SolarPanel extends Building
     {
         super(scene, x - 100, y - 100, 200, 200, location, "solarPanel");
 
+        this.ID = 2;
+
+        this.managerPrice = this.gameScene.managerPrices.solarPanel;
+
         this.available = false;
-        this.incomePerTick = 4;
+        this.incomePerTick = 45;
         this.incomeAdded = false;
 
         this.animationString = "solarPanelAnim";
 
-        this.scene.totalIncomePerTick += this.incomePerTick;
+        this.scene.currencyManager.allMachines.push(this);
 
         this.setUpUpgradeMenu();
+    }
+
+    
+    updateUpgrade()
+    {
+        if(this.gameScene.managerPrices.solarPanel < this.gameScene.currencyManager.money)
+        {
+            this.managerBut.enableButton();
+        }
+        else
+        {
+            this.managerBut.disableButton();
+            console.log("Not Enough Money");
+        }
     }
 
 }

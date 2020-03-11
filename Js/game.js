@@ -14,6 +14,7 @@ class gameScene extends Phaser.Scene
 
     currentMachines;
     totalIncomePerTick;
+    selectedMachine;
     machinePrice;
 
     constructor() {
@@ -55,12 +56,19 @@ class gameScene extends Phaser.Scene
     {
         this.machinePrice = 
         {
-            handGen: 6,
-            solarPanel: 25,
-            windTurbine: 100,
+            handGen: 70,
+            solarPanel: 820,
+            windTurbine: 10000,
             geoTer: 500,
             nuclearPlant: 1000
         };
+
+        this.managerPrices = 
+        {
+            handGen: 100,
+            solarPanel: 4500,
+            windTurbine: 30000
+        }
 
         this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
         this.fullScreen = true;
@@ -91,6 +99,13 @@ class gameScene extends Phaser.Scene
             horizontalMargin: 330,
             verticalMargin: 330
         };
+
+        this.currencyManager = 
+        {
+            money: 100,
+            totalIncomePerTick: 0,
+            allMachines:[]
+        }
 
         this.totalIncomePerTick = 0;
 
@@ -125,6 +140,7 @@ class gameScene extends Phaser.Scene
                 if (boundBox.contains(this.player.x, this.player.y))
                 {
                     this.posSelected = i;
+                    building.isSelected = true;
 
                     // IF THE PLACE IS A BUILD SPOT 
                     if (building.available)
@@ -134,7 +150,9 @@ class gameScene extends Phaser.Scene
                     }
                     else // IF THE PLACE IS ANY BUILDING
                     {
+                        building.updateUpgrade();
 
+                        this.selectedMachine = building;
                         building.upgradeMenu.setVisible(true);
                     }
                     
@@ -144,6 +162,7 @@ class gameScene extends Phaser.Scene
                 else
                 {
                     building.buyMenu.setVisible(false);
+                    building.isSelected = false;
 
                     if(building.upgradeMenu)
                     {
@@ -159,6 +178,18 @@ class gameScene extends Phaser.Scene
                     {
                         building.building.anims.stop(building.animationString);
                     }
+                }
+            }
+            
+            for(var i = 0; i < this.currencyManager.allMachines.length; i++)
+            {
+                let cm = this.currencyManager;
+                let machine = cm.allMachines[i];
+                
+                if(machine.hasManager && !machine.incomeAdded)
+                {
+                    cm.totalIncomePerTick += machine.incomePerTick;
+                    machine.incomeAdded = true;
                 }
             }
         }
@@ -220,8 +251,17 @@ class gameScene extends Phaser.Scene
     // Runs per tick
     addMoney()
     {
-        this.player.money += this.totalIncomePerTick;
-        this.UIScene.updateMoney(this.player.money);
+        let tempIncome = 0;
+        if(this.selectedMachine)
+        {
+            if(this.selectedMachine.isSelected)
+            {
+                tempIncome = this.selectedMachine.incomePerTick;
+            }
+        }
+
+        this.currencyManager.money += this.currencyManager.totalIncomePerTick + tempIncome;
+        this.UIScene.updateMoney(this.currencyManager.money);
     }
 }
 

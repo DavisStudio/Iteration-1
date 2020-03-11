@@ -4,9 +4,20 @@ class Building extends Phaser.GameObjects.Sprite
     {
         super(scene, x, y);
 
+        this.ID = 0;
+        
         this.boundBox;
         this.buyMenu;
-        
+        this.buyMenuButtons = 
+        {
+            handGen:null,
+            solarPanel:null,
+            windTurbine:null
+        };
+
+        this.upgradeBut;
+        this.managerBut;
+
         let buildingLocation = location;
         this.building = new Phaser.GameObjects.Sprite(this.scene, x, y, texture);
         
@@ -22,12 +33,15 @@ class Building extends Phaser.GameObjects.Sprite
 
         this.lastFrame = 0;
         this.available = true;
+
         this.hasManager = false;
+        this.isSelected = false;
 
         this.handGenPriceText;
+        this.managerPrice = 0;
 
         this.gameScene = this.scene.scene.manager.keys.gameScene;
-
+        
         let textStyle = 
         {
             font: '40px Changa',
@@ -51,11 +65,40 @@ class Building extends Phaser.GameObjects.Sprite
     updatePrices()
     {
         this.handGenPriceText.setText(this.gameScene.machinePrice.handGen);
+        this.solarPanelPriceText.setText(this.gameScene.machinePrice.solarPanel);
+        this.windTPriceText.setText(this.gameScene.machinePrice.windTurbine);
+
+        let money = this.gameScene.currencyManager.money;
+        let m = this.gameScene.machinePrice;
+        let temp = this.gameScene.currencyManager.totalIncomePerTick;
+
+        money -= temp;
+
+        if(money < m.handGen){
+            this.buyMenuButtons.handGen.disableButton();
+        }else{
+            this.buyMenuButtons.handGen.enableButton();
+        }
+
+        if(money < m.solarPanel){
+            this.buyMenuButtons.solarPanel.disableButton();
+        }else{
+            this.buyMenuButtons.solarPanel.enableButton();
+        }
+
+        if(money < m.windTurbine){
+            this.buyMenuButtons.windTurbine.disableButton();
+        }else{
+            this.buyMenuButtons.windTurbine.enableButton();
+        }
+        
+
     }
 
     setUpBuyMenu()
     {
         let gameScene = this.gameScene;
+        let but = this.buyMenuButtons;
 
         let textStyle = 
         {
@@ -65,7 +108,7 @@ class Building extends Phaser.GameObjects.Sprite
         }
 
        this.buyMenu = new Menu(this.scene.UIScene, config.width / 2 - 400,  config.height / 2 - 170, 800, 240, "menuBackground", [
-            new Button(this.scene.UIScene, 10, 10, "handGen", function ()
+            but.handGen = new Button(this.scene.UIScene, 10, 10, "handGen", function ()
             {
                 
                 let building = gameScene.buildingLocations[gameScene.posSelected];
@@ -73,7 +116,8 @@ class Building extends Phaser.GameObjects.Sprite
                 building.available = false; 
                 building.buyMenu.destroy();
 
-                gameScene.machinePrice.handGen = Math.floor(1.7 * gameScene.machinePrice.handGen);
+                gameScene.machinePrice.handGen = Math.floor(1.3 * gameScene.machinePrice.handGen);
+                gameScene.currencyManager.money -= gameScene.machinePrice.handGen;
 
                 gameScene.buildingLocations[gameScene.posSelected] = new HandGenerator(gameScene, building.building.x, building.building.y, 
                     building.building.width, building.building.height, gameScene.posSelected).setDepth(10);
@@ -82,12 +126,15 @@ class Building extends Phaser.GameObjects.Sprite
 
             }).setScale(1.5),
 
-            new Button(this.scene.UIScene, 180, 10, "solarPanel", function ()
+            but.solarPanel = new Button(this.scene.UIScene, 180, 10, "solarPanel", function ()
             {
                 let building = gameScene.buildingLocations[gameScene.posSelected];
 
                 building.available = false; 
                 building.buyMenu.destroy();
+
+                gameScene.machinePrice.solarPanel = Math.floor(1.4 * gameScene.machinePrice.solarPanel);
+                gameScene.currencyManager.money -= gameScene.machinePrice.solarPanel;
 
                 gameScene.buildingLocations[gameScene.posSelected] = new SolarPanel(gameScene, building.building.x, building.building.y, 
                     building.building.width, building.building.height, gameScene.posSelected).setDepth(10);
@@ -95,12 +142,15 @@ class Building extends Phaser.GameObjects.Sprite
                 building.destroy();
             }).setScale(1.5),
 
-            new Button(this.scene.UIScene, 350, 10, "windTurbine", function ()
+            but.windTurbine = new Button(this.scene.UIScene, 350, 10, "windTurbine", function ()
             {
                 let building = gameScene.buildingLocations[gameScene.posSelected];
 
                 building.available = false; 
                 building.buyMenu.destroy();
+
+                gameScene.machinePrice.windTurbine = Math.floor(1.3 * gameScene.machinePrice.windTurbine);
+                gameScene.currencyManager.money -= gameScene.machinePrice.windTurbine;
 
                 gameScene.buildingLocations[gameScene.posSelected] = new WindTurbine(gameScene, building.building.x, building.building.y, 
                     building.building.width, building.building.height, gameScene.posSelected).setDepth(10);
@@ -108,7 +158,9 @@ class Building extends Phaser.GameObjects.Sprite
                 building.destroy();
             }).setScale(1.5),
 
-            this.handGenPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 80, 180, gameScene.machinePrice.handGen,textStyle).setOrigin(0.5,0)
+            this.handGenPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 80, 180, gameScene.machinePrice.handGen,textStyle).setOrigin(0.5,0),
+            this.solarPanelPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 255, 180, gameScene.machinePrice.solarPanel,textStyle).setOrigin(0.5,0),
+            this.windTPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 425, 180, gameScene.machinePrice.windTurbine,textStyle).setOrigin(0.5,0)
         ]);
 
         this.scene.UIScene.add.existing(this.buyMenu);
@@ -118,37 +170,60 @@ class Building extends Phaser.GameObjects.Sprite
     setUpUpgradeMenu()
     {
         let thisBuilding = this;
+        let gameScene = this.gameScene;
 
-        let textStyle = 
+        let textStyle =
         {
             font: '40px Changa',
             fill: '#ffffff',
             align: "center"
         }
 
-        let descTextStyle = 
+        let descTextStyle =
         {
             font: '22px Changa',
             fill: '#ffffff',
             align: "left"
         }
 
-       this.upgradeMenu = new Menu(this.scene.UIScene, config.width / 2 - 400,  config.height / 2 - 290, 800, 240, "menuBackground", [
-        new Button(this.scene.UIScene, 20, 40, "button", function ()
+        let buttonStyle =
         {
-            thisBuilding.hasManager = true;
-            console.log(this.hasManager + "Manager BOUGHT");
-        }).setScale(5,3),
-       
-        new Button(this.scene.UIScene, 20, 170, "button", function ()
-        {
-        },false).setScale(5,3),
-        
-        new Button(this.scene.UIScene, 570, 170, "buttonRed", function ()
-        {
-        }).setScale(5,3),
+            font: '24px Changa',
+            fill: '#000000',
+            align: "center"
+        }
 
-        new Phaser.GameObjects.Text(this.scene.UIScene, 230, 180, "Manager will run the machine \n while you are away", descTextStyle)
+        this.upgradeMenu = new Menu(this.scene.UIScene, config.width / 2 - 400, config.height / 2 - 290, 800, 240, "menuBackground", [
+            this.upgradeBut = new Button(this.scene.UIScene, 20, 40, "button", function ()
+            {
+            }).setScale(5, 3),
+
+            this.managerBut = new Button(this.scene.UIScene, 20, 170, "button", function ()
+            {
+                console.log(gameScene);
+                if(thisBuilding.ID == 1)
+                {
+                    gameScene.currencyManager.money -=  gameScene.managerPrices.handGen;
+                }
+                else if(thisBuilding.ID == 2)
+                {
+                    gameScene.currencyManager.money -=  gameScene.managerPrices.solarPanel;
+                }
+                else if(thisBuilding.ID == 3)
+                {
+                    gameScene.currencyManager.money -=  gameScene.managerPrices.windTurbine;
+                }
+
+                thisBuilding.hasManager = true;
+                console.log("MANAGER BOUGHT");
+            }).setScale(5, 3),
+
+            new Button(this.scene.UIScene, 570, 170, "buttonRed", function ()
+            {
+            }).setScale(5, 3),
+
+            new Phaser.GameObjects.Text(this.scene.UIScene, 230, 177, "Manager will run the machine \n while you are away", descTextStyle),
+            new Phaser.GameObjects.Text(this.scene.UIScene, 100, 190, this.managerPrice, buttonStyle)
         ]);
 
         /*
@@ -167,7 +242,7 @@ class Building extends Phaser.GameObjects.Sprite
 
             }).setScale(1.5),
         */
-       // 
+        // 
         this.scene.UIScene.add.existing(this.upgradeMenu);
         this.upgradeMenu.setVisible(false);
     }

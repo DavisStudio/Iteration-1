@@ -60,6 +60,18 @@ class Button extends Phaser.GameObjects.Sprite {
             }
         });
     }
+
+    disableButton()
+    {
+        this.enabled = false;
+        this.setTint(0x646e6d);
+    }
+
+    enableButton()
+    {
+        this.enabled = true;
+        this.setTint(0xffffff);
+    }
 }
 
 /**
