@@ -50,6 +50,7 @@ class gameScene extends Phaser.Scene
         this.load.image("button", "Sprites/UI/button.png");
         this.load.image("buttonDown", "Sprites/UI/button-Pressed.png");
         this.load.image("buttonRed", "Sprites/UI/button-red.png");
+        this.load.image("uiVerticalBrake", "Sprites/UI/menu-brake-vertical.png")
     }
 
     create()

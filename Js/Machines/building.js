@@ -183,7 +183,7 @@ class Building extends Phaser.GameObjects.Sprite
         {
             font: '22px Changa',
             fill: '#ffffff',
-            align: "left"
+            align: "center"
         }
 
         let buttonStyle =
@@ -223,7 +223,9 @@ class Building extends Phaser.GameObjects.Sprite
             }).setScale(5, 3),
 
             new Phaser.GameObjects.Text(this.scene.UIScene, 230, 177, "Manager will run the machine \n while you are away", descTextStyle),
-            new Phaser.GameObjects.Text(this.scene.UIScene, 100, 190, this.managerPrice, buttonStyle)
+            new Phaser.GameObjects.Text(this.scene.UIScene, 100, 190, this.managerPrice, buttonStyle),
+            new Phaser.GameObjects.Text(this.scene.UIScene, 580, 120, "Sell your Machine \n (Doesn't work yet)", descTextStyle),
+            new Phaser.GameObjects.Sprite(this.scene.UIScene, 542, 120, "uiVerticalBrake").setScale(3,5)
         ]);
 
         /*
