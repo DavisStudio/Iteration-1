@@ -9,7 +9,7 @@ class SolarPanel extends Building
         this.managerPrice = this.gameScene.managerPrices.solarPanel;
 
         this.available = false;
-        this.incomePerTick = 45;
+        this.incomePerTick = 55;
         this.incomeAdded = false;
 
         this.animationString = "solarPanelAnim";

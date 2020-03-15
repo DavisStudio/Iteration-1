@@ -18,9 +18,6 @@ class UIScene extends Phaser.Scene
 
     preload()
     {
-        this.load.image("underJoyStick", "Sprites/UI/underJoyStick.png");
-        this.load.image("joyStick", "Sprites/UI/joyStick.png");
-
         this.load.image("moneyBarUI", "Sprites/UI/moneyUI.png");
         this.load.image("electricIconUI", "Sprites/UI/electric.png");
     }

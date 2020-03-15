@@ -12,7 +12,8 @@ class Building extends Phaser.GameObjects.Sprite
         {
             handGen:null,
             solarPanel:null,
-            windTurbine:null
+            windTurbine:null,
+            hamsterWheel: null
         };
 
         this.upgradeBut;
@@ -67,12 +68,10 @@ class Building extends Phaser.GameObjects.Sprite
         this.handGenPriceText.setText(this.gameScene.machinePrice.handGen);
         this.solarPanelPriceText.setText(this.gameScene.machinePrice.solarPanel);
         this.windTPriceText.setText(this.gameScene.machinePrice.windTurbine);
+        this.hamsterWPriceText.setText(this.gameScene.machinePrice.hamsterWheel);
 
         let money = this.gameScene.currencyManager.money;
         let m = this.gameScene.machinePrice;
-        let temp = this.gameScene.currencyManager.totalIncomePerTick;
-
-        money -= temp;
 
         if(money < m.handGen){
             this.buyMenuButtons.handGen.disableButton();
@@ -90,6 +89,12 @@ class Building extends Phaser.GameObjects.Sprite
             this.buyMenuButtons.windTurbine.disableButton();
         }else{
             this.buyMenuButtons.windTurbine.enableButton();
+        }
+
+        if(money < m.hamsterWheel){
+            this.buyMenuButtons.hamsterWheel.disableButton();
+        }else{
+            this.buyMenuButtons.hamsterWheel.enableButton();
         }
         
 
@@ -116,8 +121,9 @@ class Building extends Phaser.GameObjects.Sprite
                 building.available = false; 
                 building.buyMenu.destroy();
 
-                gameScene.machinePrice.handGen = Math.floor(1.25 * gameScene.machinePrice.handGen);
                 gameScene.currencyManager.money -= gameScene.machinePrice.handGen;
+                gameScene.machinePrice.handGen = Math.floor(1.19 * gameScene.machinePrice.handGen);
+                
 
                 gameScene.buildingLocations[gameScene.posSelected] = new HandGenerator(gameScene, building.building.x, building.building.y, 
                     building.building.width, building.building.height, gameScene.posSelected).setDepth(10);
@@ -133,8 +139,9 @@ class Building extends Phaser.GameObjects.Sprite
                 building.available = false; 
                 building.buyMenu.destroy();
 
-                gameScene.machinePrice.solarPanel = Math.floor(1.25 * gameScene.machinePrice.solarPanel);
                 gameScene.currencyManager.money -= gameScene.machinePrice.solarPanel;
+                gameScene.machinePrice.solarPanel = Math.floor(1.19 * gameScene.machinePrice.solarPanel);
+                
 
                 gameScene.buildingLocations[gameScene.posSelected] = new SolarPanel(gameScene, building.building.x, building.building.y, 
                     building.building.width, building.building.height, gameScene.posSelected).setDepth(10);
@@ -149,10 +156,26 @@ class Building extends Phaser.GameObjects.Sprite
                 building.available = false; 
                 building.buyMenu.destroy();
 
-                gameScene.machinePrice.windTurbine = Math.floor(1.25 * gameScene.machinePrice.windTurbine);
                 gameScene.currencyManager.money -= gameScene.machinePrice.windTurbine;
-
+                gameScene.machinePrice.windTurbine = Math.floor(1.19 * gameScene.machinePrice.windTurbine);
+                
                 gameScene.buildingLocations[gameScene.posSelected] = new WindTurbine(gameScene, building.building.x, building.building.y, 
+                    building.building.width, building.building.height, gameScene.posSelected).setDepth(10);
+
+                building.destroy();
+            }).setScale(1.5),
+
+            but.hamsterWheel = new Button(this.scene.UIScene, 520, 10, "hamsterWheel", function ()
+            {
+                let building = gameScene.buildingLocations[gameScene.posSelected];
+
+                building.available = false; 
+                building.buyMenu.destroy();
+
+                gameScene.currencyManager.money -= gameScene.machinePrice.hamsterWheel;
+                gameScene.machinePrice.hamsterWheel = Math.floor(1.19 * gameScene.machinePrice.hamsterWheel);
+
+                gameScene.buildingLocations[gameScene.posSelected] = new HamsterWheel(gameScene, building.building.x, building.building.y, 
                     building.building.width, building.building.height, gameScene.posSelected).setDepth(10);
 
                 building.destroy();
@@ -160,7 +183,8 @@ class Building extends Phaser.GameObjects.Sprite
 
             this.handGenPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 80, 180, gameScene.machinePrice.handGen,textStyle).setOrigin(0.5,0),
             this.solarPanelPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 255, 180, gameScene.machinePrice.solarPanel,textStyle).setOrigin(0.5,0),
-            this.windTPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 425, 180, gameScene.machinePrice.windTurbine,textStyle).setOrigin(0.5,0)
+            this.windTPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 425, 180, gameScene.machinePrice.windTurbine,textStyle).setOrigin(0.5,0),
+            this.hamsterWPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 595, 180, gameScene.machinePrice.hamsterWheel,textStyle).setOrigin(0.5,0)
         ]);
 
         this.scene.UIScene.add.existing(this.buyMenu);

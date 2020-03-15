@@ -22,7 +22,10 @@ class gameScene extends Phaser.Scene
     }
 
     preload()
-    {
+    {   
+        this.load.image("underJoyStick", "Sprites/UI/underJoyStick.png");
+        this.load.image("joyStick", "Sprites/UI/JoyStick.png");
+
         this.load.image("playerImage", "Sprites/player.png");
         this.load.image("fullScreenBtn", "Sprites/UI/fullScreen.png");
 
@@ -46,6 +49,12 @@ class gameScene extends Phaser.Scene
             frameHeight: 100
         });
 
+        this.load.spritesheet("hamsterWheel", "Sprites/Machines/hamsterWheel.png", 
+        {
+            frameWidth: 100,
+            frameHeight: 100
+        });
+
         this.load.image("menuBackground", "Sprites/UI/menuBackground.png");
         this.load.image("button", "Sprites/UI/button.png");
         this.load.image("buttonDown", "Sprites/UI/button-Pressed.png");
@@ -61,14 +70,16 @@ class gameScene extends Phaser.Scene
             solarPanel: 820,
             windTurbine: 10000,
             geoTer: 500,
-            nuclearPlant: 1000
+            nuclearPlant: 1000,
+            hamsterWheel: 20000
         };
 
         this.managerPrices = 
         {
             handGen: 100,
             solarPanel: 4500,
-            windTurbine: 22000
+            windTurbine: 22000,
+            hamsterWheel: 44000
         }
 
         this.graphics = this.add.graphics({ lineStyle: { width: 0, color: 0x0000aa }, fillStyle: { color: 0xaa0000 } });
@@ -242,6 +253,17 @@ class gameScene extends Phaser.Scene
             frames: this.anims.generateFrameNumbers('windTurbine', {
                 start: 0,
                 end: 5,
+                first: 0
+            }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'hamsterWheelAnim',
+            frames: this.anims.generateFrameNumbers('hamsterWheel', {
+                start: 0,
+                end: 3,
                 first: 0
             }),
             frameRate: 10,
