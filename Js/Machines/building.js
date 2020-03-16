@@ -19,7 +19,7 @@ class Building extends Phaser.GameObjects.Sprite
         this.upgradeBut;
         this.managerBut;
 
-        let buildingLocation = location;
+        this.buildingLocation = location;
         this.building = new Phaser.GameObjects.Sprite(this.scene, x, y, texture);
         
         this.building.x += width/2;
@@ -37,9 +37,12 @@ class Building extends Phaser.GameObjects.Sprite
 
         this.hasManager = false;
         this.isSelected = false;
+        this.sold = false;
 
         this.handGenPriceText;
         this.managerPrice = 0;
+
+        this.machineWorth = 0;
 
         this.gameScene = this.scene.scene.manager.keys.gameScene;
         
@@ -65,10 +68,10 @@ class Building extends Phaser.GameObjects.Sprite
 
     updatePrices()
     {
-        this.handGenPriceText.setText(this.gameScene.machinePrice.handGen);
-        this.solarPanelPriceText.setText(this.gameScene.machinePrice.solarPanel);
-        this.windTPriceText.setText(this.gameScene.machinePrice.windTurbine);
-        this.hamsterWPriceText.setText(this.gameScene.machinePrice.hamsterWheel);
+        this.handGenPriceText.setText(this.gameScene.numCompressor(this.gameScene.machinePrice.handGen));
+        this.solarPanelPriceText.setText(this.gameScene.numCompressor(this.gameScene.machinePrice.solarPanel));
+        this.windTPriceText.setText(this.gameScene.numCompressor(this.gameScene.machinePrice.windTurbine));
+        this.hamsterWPriceText.setText(this.gameScene.numCompressor(this.gameScene.machinePrice.hamsterWheel));
 
         let money = this.gameScene.currencyManager.money;
         let m = this.gameScene.machinePrice;
@@ -96,8 +99,6 @@ class Building extends Phaser.GameObjects.Sprite
         }else{
             this.buyMenuButtons.hamsterWheel.enableButton();
         }
-        
-
     }
 
     setUpBuyMenu()
@@ -168,7 +169,7 @@ class Building extends Phaser.GameObjects.Sprite
             but.hamsterWheel = new Button(this.scene.UIScene, 520, 10, "hamsterWheel", function ()
             {
                 let building = gameScene.buildingLocations[gameScene.posSelected];
-
+                
                 building.available = false; 
                 building.buyMenu.destroy();
 
@@ -181,10 +182,10 @@ class Building extends Phaser.GameObjects.Sprite
                 building.destroy();
             }).setScale(1.5),
 
-            this.handGenPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 80, 180, gameScene.machinePrice.handGen,textStyle).setOrigin(0.5,0),
-            this.solarPanelPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 255, 180, gameScene.machinePrice.solarPanel,textStyle).setOrigin(0.5,0),
-            this.windTPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 425, 180, gameScene.machinePrice.windTurbine,textStyle).setOrigin(0.5,0),
-            this.hamsterWPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 595, 180, gameScene.machinePrice.hamsterWheel,textStyle).setOrigin(0.5,0)
+            this.handGenPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 80, 180, gameScene.numCompressor(gameScene.machinePrice.handGen),textStyle).setOrigin(0.5,0),
+            this.solarPanelPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 255, 180, gameScene.numCompressor(gameScene.machinePrice.solarPanel),textStyle).setOrigin(0.5,0),
+            this.windTPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 425, 180, gameScene.numCompressor(gameScene.machinePrice.windTurbine),textStyle).setOrigin(0.5,0),
+            this.hamsterWPriceText = new Phaser.GameObjects.Text(this.scene.UIScene, 595, 180, gameScene.numCompressor(gameScene.machinePrice.hamsterWheel),textStyle).setOrigin(0.5,0)
         ]);
 
         this.scene.UIScene.add.existing(this.buyMenu);
@@ -224,7 +225,6 @@ class Building extends Phaser.GameObjects.Sprite
 
             this.managerBut = new Button(this.scene.UIScene, 20, 170, "button", function ()
             {
-                console.log(gameScene);
                 if(thisBuilding.ID == 1)
                 {
                     gameScene.currencyManager.money -=  gameScene.managerPrices.handGen;
@@ -237,6 +237,10 @@ class Building extends Phaser.GameObjects.Sprite
                 {
                     gameScene.currencyManager.money -=  gameScene.managerPrices.windTurbine;
                 }
+                else if(thisBuilding.ID == 4)
+                {
+                    gameScene.currencyManager.money -=  gameScene.managerPrices.hamsterWheel;
+                }
 
                 thisBuilding.hasManager = true;
                 console.log("MANAGER BOUGHT");
@@ -244,11 +248,30 @@ class Building extends Phaser.GameObjects.Sprite
 
             new Button(this.scene.UIScene, 570, 170, "buttonRed", function ()
             {
+                let bl = thisBuilding.buildingLocation;
+                let bc = gameScene.buildConfig; 
+                /*
+                gameScene.buildingLocations[bl.x + (bl.y * 10)] = new Building(gameScene, thisBuilding.x,
+                thisBuilding.y, bc.buildWidth, bc.buildHeight, 
+                thisBuilding.buildingLocation, "buildSpace");
+                */
+                
+                let machine = gameScene.buildingLocations[bl];
+                console.log(machine);
+                
+                machine.available = true;
+                machine.sold = true;
+                machine.upgradeMenu.setVisible(false);
+                
+                machine.building.active = false;
+                machine.building.destroy(gameScene);
+                
             }).setScale(5, 3),
 
             new Phaser.GameObjects.Text(this.scene.UIScene, 230, 177, "Manager will run the machine \n while you are away", descTextStyle),
-            new Phaser.GameObjects.Text(this.scene.UIScene, 100, 190, this.managerPrice, buttonStyle),
-            new Phaser.GameObjects.Text(this.scene.UIScene, 580, 120, "Sell your Machine \n (Doesn't work yet)", descTextStyle),
+            new Phaser.GameObjects.Text(this.scene.UIScene, 100, 190, this.gameScene.numCompressor(this.managerPrice), buttonStyle),
+            new Phaser.GameObjects.Text(this.scene.UIScene, 585, 140, "Sell your Machine", descTextStyle),
+            new Phaser.GameObjects.Text(this.scene.UIScene, 585, 170, this.machineWorth , descTextStyle),
             new Phaser.GameObjects.Sprite(this.scene.UIScene, 542, 120, "uiVerticalBrake").setScale(3,5)
         ]);
 
@@ -271,5 +294,25 @@ class Building extends Phaser.GameObjects.Sprite
         // 
         this.scene.UIScene.add.existing(this.upgradeMenu);
         this.upgradeMenu.setVisible(false);
+    }
+
+    updateManagerAlert()
+    {
+        
+        if(this.isSelected || this.hasManager)
+        {
+            this.managerAlert.setVisible(false);
+        }
+        else
+        {
+            this.managerAlert.setVisible(true);
+        }
+    }
+
+    machineSetUp()
+    {
+        this.managerAlert = new Phaser.GameObjects.Sprite(this.gameScene, this.x + 10, this.y + 10, "managerAlert");
+        this.managerAlert.anims.play("managerAlertAnim").setVisible(false);
+        this.gameScene.add.existing(this.managerAlert);
     }
 }

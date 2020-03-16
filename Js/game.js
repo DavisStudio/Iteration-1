@@ -60,6 +60,10 @@ class gameScene extends Phaser.Scene
         this.load.image("buttonDown", "Sprites/UI/button-Pressed.png");
         this.load.image("buttonRed", "Sprites/UI/button-red.png");
         this.load.image("uiVerticalBrake", "Sprites/UI/menu-brake-vertical.png")
+        this.load.spritesheet("managerAlert", "Sprites/Machines/UI/redAlert.png", {
+            frameWidth: 64,
+            frameHeight: 64
+        });
     }
 
     create()
@@ -146,14 +150,21 @@ class gameScene extends Phaser.Scene
                 {
                     //let x = i % 10;
                    // let y = Math.floor(i / 10);
-
+                
                 let building = this.buildingLocations[i];
                 let boundBox = building.boundBox;
+                
+                if(!building.available)
+                {
+                    building.updateManagerAlert()
+                }
+
                 if (boundBox.contains(this.player.x, this.player.y))
                 {
                     this.posSelected = i;
                     building.isSelected = true;
 
+                    console.log(building.building);
                     // IF THE PLACE IS A BUILD SPOT 
                     if (building.available)
                     {
@@ -168,27 +179,32 @@ class gameScene extends Phaser.Scene
                         building.upgradeMenu.setVisible(true);
                     }
                     
-                    building.building.anims.play(building.animationString, true, building.lastFrame);
-                    
-                } 
+                    if(building.building.anims)
+                    {
+                        building.building.anims.play(building.animationString, true, building.lastFrame);
+                    }
+                }
                 else
                 {
                     building.buyMenu.setVisible(false);
                     building.isSelected = false;
 
-                    if(building.upgradeMenu)
+                    if (building.upgradeMenu)
                     {
                         building.upgradeMenu.setVisible(false);
                     }
-                    
-                    if(building.building.anims.currentFrame)
-                    {
-                        building.lastFrame = building.building.anims.currentFrame.index;
-                    }
 
-                    if(!building.hasManager)
+                    if (building.building.anims)
                     {
-                        building.building.anims.stop(building.animationString);
+                        if (building.building.anims.currentFrame)
+                        {
+                            building.lastFrame = building.building.anims.currentFrame.index;
+                        }
+
+                        if (!building.hasManager)
+                        {
+                            building.building.anims.stop(building.animationString);
+                        }
                     }
                 }
             }
@@ -203,7 +219,17 @@ class gameScene extends Phaser.Scene
                     cm.totalIncomePerTick += machine.incomePerTick;
                     machine.incomeAdded = true;
                 }
+
+                if(machine.sold)
+                {
+                    if(machine.hasManager)
+                    {
+                        cm.totalIncomePerTick -= machine.incomePerTick;
+                    }
+                    cm.allMachines.splice(i, i + 1)
+                }
             }
+
         }
     }
 
@@ -269,6 +295,17 @@ class gameScene extends Phaser.Scene
             frameRate: 10,
             repeat: -1
         });
+
+        this.anims.create({
+            key: 'managerAlertAnim',
+            frames: this.anims.generateFrameNumbers('managerAlert', {
+                start: 0,
+                end: 4,
+                first: 0
+            }),
+            frameRate: 10,
+            repeat: -1
+        });
     }
 
     // Runs per tick
@@ -277,14 +314,52 @@ class gameScene extends Phaser.Scene
         let tempIncome = 0;
         if(this.selectedMachine)
         {
-            if(this.selectedMachine.isSelected)
+            if(this.selectedMachine.isSelected && !this.selectedMachine.sold)
             {
                 tempIncome = this.selectedMachine.incomePerTick;
             }
         }
 
         this.currencyManager.money += this.currencyManager.totalIncomePerTick + tempIncome;
-        this.UIScene.updateMoney(this.currencyManager.money);
+        this.UIScene.updateMoney(this.numCompressor(this.currencyManager.money));
+    }
+
+    /** 
+     * Converts large number to a compressed version 
+     * returns string
+     * @param {number} money - int or float value to be converted
+    */
+    numCompressor(money)
+    {
+        var numberTags = ["","k", "m", "b", "t", "q", "qn", "s", "spt"];
+        money = money.toString();
+        var len = money.length;
+        var lenDiv = Math.floor(len / 3);
+        var lenMod = len % 3;
+
+        var endString = "";
+
+        if(len > 3)
+        {
+            if(lenMod == 1)
+            {
+                endString = money.substr(0, 1) + "." + money.substr(1, 2) + numberTags[lenDiv];
+            }
+            else if(lenMod == 2)
+            {
+                endString = money.substr(0, 2) + "." + money.substr(2, 2) + numberTags[lenDiv];
+            }
+            else if(lenMod == 0)
+            {
+                endString = money.substr(0, 3) + numberTags[lenDiv - 1];
+            }
+        }
+        else
+        {
+            endString = money;
+        }
+
+        return endString
     }
 }
 

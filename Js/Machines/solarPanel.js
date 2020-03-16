@@ -16,6 +16,7 @@ class SolarPanel extends Building
 
         this.scene.currencyManager.allMachines.push(this);
 
+        this.machineSetUp();
         this.setUpUpgradeMenu();
     }
 
