@@ -16,6 +16,7 @@ class gameScene extends Phaser.Scene
     totalIncomePerTick;
     selectedMachine;
     machinePrice;
+    machineIncome;
 
     constructor() {
         super("gameScene");
@@ -72,7 +73,7 @@ class gameScene extends Phaser.Scene
     {
         this.machinePrice = 
         {
-            handGen: 70,
+            handGen: 100,
             solarPanel: 820,
             windTurbine: 10000,
             geoTer: 500,
@@ -80,6 +81,16 @@ class gameScene extends Phaser.Scene
             hamsterWheel: 20000,
             newLand: 1500
         };
+
+        this.machineIncome =
+        {
+            handGen: 500,
+            solarPanel: 55,
+            windTurbine: 10000,
+            geoTer: 500,
+            nuclearPlant: 1000,
+            hamsterWheel: 470,
+        }
 
         this.managerPrices = 
         {
@@ -196,6 +207,11 @@ class gameScene extends Phaser.Scene
                     building.buyMenu.setVisible(false);
                     building.isSelected = false;
 
+                    if(building.unlockLandMenu)
+                    {
+                        building.unlockLandMenu.setVisible(false);
+                    }
+                    
                     if (building.upgradeMenu)
                     {
                         building.upgradeMenu.setVisible(false);
@@ -345,6 +361,7 @@ class gameScene extends Phaser.Scene
     {
         var numberTags = ["","k", "m", "b", "t", "q", "qn", "s", "spt"];
         
+        money = Math.floor(money);
         money = money.toString();
         
         var len = money.length;

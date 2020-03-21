@@ -120,13 +120,23 @@ class Building extends Phaser.GameObjects.Sprite
     updateUnlockLandUI()
     {
         let gS = this.gameScene;
-        console.log(gS.machinePrice.newLand);
+        
         this.unlockLandUI.priceText.setText(gS.numCompressor(gS.machinePrice.newLand));
+        
+        if(gS.machinePrice.newLand < gS.currencyManager.money)
+        {
+            this.unlockLandUI.buyButton.enableButton();
+        }
+        else
+        {
+            this.unlockLandUI.buyButton.disableButton();
+        }
     }
 
     setUpLockedLandUI()
     {
         let gameScene = this.gameScene;
+        let thisBuilding = this;
 
         let textStyle = this.textStyle;
         let descStyle = this.descTextStyle;
@@ -135,7 +145,13 @@ class Building extends Phaser.GameObjects.Sprite
         this.unlockLandMenu = new Menu(this.scene.UIScene, config.width / 2 - 150,  config.height / 2 - 150, 300, 300, "menuBackground", [
             this.unlockLandUI.buyButton = new Button(this.scene.UIScene, 150, 230, "buyButton", function ()
             {
+                thisBuilding.locked = false;
+                thisBuilding.unlockLandMenu.destroy();
+                thisBuilding.building.setTexture("buildSpace");
                 
+                gameScene.currencyManager.money -= gameScene.machinePrice.newLand;
+                gameScene.machinePrice.newLand *= 1.2;
+
                 console.log("Unlock");
 
             }).setScale(3.5).setOrigin(0.5),

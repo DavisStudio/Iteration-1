@@ -12,11 +12,12 @@ class HamsterWheel extends Building
         this.machinePrice = 5;
 
         this.available = false;
-        this.incomePerTick = 470;
+        this.incomePerTick = this.gameScene.machineIncome.hamsterWheel;
         this.incomeAdded = false;
 
         this.scene.currencyManager.allMachines.push(this);
 
+        this.machineSetUp();
         this.setUpUpgradeMenu();
         this.animationString = "hamsterWheelAnim";
     }

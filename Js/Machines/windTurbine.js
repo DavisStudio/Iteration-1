@@ -9,14 +9,15 @@ class WindTurbine extends Building
         this.managerPrice = this.gameScene.managerPrices.windTurbine;
 
         this.upgradeMenu;
-        this.machinePrice = 5;
 
         this.available = false;
-        this.incomePerTick = 250;
+
+        this.incomePerTick = this.gameScene.machineIncome.windTurbine;
         this.incomeAdded = false;
 
         this.scene.currencyManager.allMachines.push(this);
 
+        this.machineSetUp();
         this.setUpUpgradeMenu();
         this.animationString = "windTurbineAnim";
     }

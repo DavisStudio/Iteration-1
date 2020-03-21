@@ -9,10 +9,9 @@ class HandGenerator extends Building
         this.managerPrice = this.gameScene.managerPrices.handGen;
 
         this.upgradeMenu;
-        this.machinePrice = 5;
-
+ 
         this.available = false;
-        this.incomePerTick = 105;
+        this.incomePerTick = this.gameScene.machineIncome.handGen;
         this.incomeAdded = false;
 
         this.scene.currencyManager.allMachines.push(this);
