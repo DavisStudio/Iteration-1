@@ -16,6 +16,14 @@ class Building extends Phaser.GameObjects.Sprite
             hamsterWheel: null
         };
 
+        this.unlockLandMenu;
+        this.unlockLandUI =
+        {
+            priceText: null,
+            buyButton: null,
+            desc: null
+        };
+
         this.upgradeBut;
         this.managerBut;
 
@@ -35,6 +43,7 @@ class Building extends Phaser.GameObjects.Sprite
         this.lastFrame = 0;
         this.available = true;
 
+        this.locked = false;
         this.hasManager = false;
         this.isSelected = false;
         this.sold = false;
@@ -46,9 +55,16 @@ class Building extends Phaser.GameObjects.Sprite
 
         this.gameScene = this.scene.scene.manager.keys.gameScene;
         
-        let textStyle = 
+        this.textStyle = 
         {
             font: '40px Changa',
+            fill: '#ffffff',
+            align: "center"
+        }
+
+        this.descTextStyle =
+        {
+            font: '22px Changa',
             fill: '#ffffff',
             align: "center"
         }
@@ -101,17 +117,43 @@ class Building extends Phaser.GameObjects.Sprite
         }
     }
 
+    updateUnlockLandUI()
+    {
+        let gS = this.gameScene;
+        console.log(gS.machinePrice.newLand);
+        this.unlockLandUI.priceText.setText(gS.numCompressor(gS.machinePrice.newLand));
+    }
+
+    setUpLockedLandUI()
+    {
+        let gameScene = this.gameScene;
+
+        let textStyle = this.textStyle;
+        let descStyle = this.descTextStyle;
+
+
+        this.unlockLandMenu = new Menu(this.scene.UIScene, config.width / 2 - 150,  config.height / 2 - 150, 300, 300, "menuBackground", [
+            this.unlockLandUI.buyButton = new Button(this.scene.UIScene, 150, 230, "buyButton", function ()
+            {
+                
+                console.log("Unlock");
+
+            }).setScale(3.5).setOrigin(0.5),
+
+            this.unlockLandUI.priceText = new Phaser.GameObjects.Text(this.scene.UIScene, 160, 80, gameScene.numCompressor(gameScene.machinePrice.newLand),textStyle).setOrigin(0.5, 0.5)
+        ]);
+        
+        this.scene.UIScene.add.existing(this.unlockLandMenu);
+        this.unlockLandMenu.setVisible(false);
+    }
+
     setUpBuyMenu()
     {
         let gameScene = this.gameScene;
         let but = this.buyMenuButtons;
 
-        let textStyle = 
-        {
-            font: '40px Changa',
-            fill: '#ffffff',
-            align: "center"
-        }
+        let textStyle = this.textStyle;
+  
 
        this.buyMenu = new Menu(this.scene.UIScene, config.width / 2 - 400,  config.height / 2 - 170, 800, 240, "menuBackground", [
             but.handGen = new Button(this.scene.UIScene, 10, 10, "handGen", function ()
@@ -197,19 +239,9 @@ class Building extends Phaser.GameObjects.Sprite
         let thisBuilding = this;
         let gameScene = this.gameScene;
 
-        let textStyle =
-        {
-            font: '40px Changa',
-            fill: '#ffffff',
-            align: "center"
-        }
+        let textStyle = this.textStyle;
 
-        let descTextStyle =
-        {
-            font: '22px Changa',
-            fill: '#ffffff',
-            align: "center"
-        }
+        let descTextStyle = this.descTextStyle;
 
         let buttonStyle =
         {
@@ -257,7 +289,6 @@ class Building extends Phaser.GameObjects.Sprite
                 */
                 
                 let machine = gameScene.buildingLocations[bl];
-                console.log(machine);
                 
                 machine.available = true;
                 machine.sold = true;
@@ -314,5 +345,12 @@ class Building extends Phaser.GameObjects.Sprite
         this.managerAlert = new Phaser.GameObjects.Sprite(this.gameScene, this.x + 10, this.y + 10, "managerAlert");
         this.managerAlert.anims.play("managerAlertAnim").setVisible(false);
         this.gameScene.add.existing(this.managerAlert);
+    }
+
+    lockBuilding()
+    {
+        this.building.setTexture("buildSpaceLocked");
+        this.locked = true;
+        this.setUpLockedLandUI();
     }
 }

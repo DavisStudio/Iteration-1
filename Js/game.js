@@ -32,6 +32,7 @@ class gameScene extends Phaser.Scene
         this.load.image("backGroundGrass", "Sprites/TileSets/backGround.png");
         
         this.load.image("buildSpace", "Sprites/TileSets/sand.png");
+        this.load.image("buildSpaceLocked", "Sprites/TileSets/sandLocked.png");
         
         this.load.spritesheet("handGen", "Sprites/Machines/handGenerator.png", 
         {
@@ -57,6 +58,7 @@ class gameScene extends Phaser.Scene
 
         this.load.image("menuBackground", "Sprites/UI/menuBackground.png");
         this.load.image("button", "Sprites/UI/button.png");
+        this.load.image("buyButton", "Sprites/UI/buyButton.png");
         this.load.image("buttonDown", "Sprites/UI/button-Pressed.png");
         this.load.image("buttonRed", "Sprites/UI/button-red.png");
         this.load.image("uiVerticalBrake", "Sprites/UI/menu-brake-vertical.png")
@@ -75,7 +77,8 @@ class gameScene extends Phaser.Scene
             windTurbine: 10000,
             geoTer: 500,
             nuclearPlant: 1000,
-            hamsterWheel: 20000
+            hamsterWheel: 20000,
+            newLand: 1500
         };
 
         this.managerPrices = 
@@ -108,8 +111,8 @@ class gameScene extends Phaser.Scene
         this.cameras.main.startFollow(this.player, true, 0.5, 0.5);
         
         this.buildConfig = {
-            gridWidth: 5,
-            gridHeight: 5,
+            gridWidth: 10,
+            gridHeight: 10,
             buildWidth: 180,
             buildHeight: 180,
             horizontalMargin: 330,
@@ -142,19 +145,19 @@ class gameScene extends Phaser.Scene
             console.log("Enter FullScreen");
         }
         else
-        {   
-                this.player.setVelocityX(this.playerMovementVector.x * this.playerSpeed);
-                this.player.setVelocityY(this.playerMovementVector.y * this.playerSpeed);
+        {
+            this.player.setVelocityX(this.playerMovementVector.x * this.playerSpeed);
+            this.player.setVelocityY(this.playerMovementVector.y * this.playerSpeed);
 
-                for(var i = 0; i < this.buildingLocations.length; i++)
-                {
-                    //let x = i % 10;
-                   // let y = Math.floor(i / 10);
-                
+            for (var i = 0; i < this.buildingLocations.length; i++)
+            {
+                //let x = i % 10;
+                // let y = Math.floor(i / 10);
+
                 let building = this.buildingLocations[i];
                 let boundBox = building.boundBox;
-                
-                if(!building.available)
+
+                if (!building.available)
                 {
                     building.updateManagerAlert()
                 }
@@ -164,12 +167,16 @@ class gameScene extends Phaser.Scene
                     this.posSelected = i;
                     building.isSelected = true;
 
-                    console.log(building.building);
                     // IF THE PLACE IS A BUILD SPOT 
-                    if (building.available)
+                    if (building.available && !building.locked)
                     {
                         building.updatePrices();
                         building.buyMenu.setVisible(true);
+                    }
+                    else if(building.locked)
+                    {
+                        building.updateUnlockLandUI();
+                        building.unlockLandMenu.setVisible(true);
                     }
                     else // IF THE PLACE IS ANY BUILDING
                     {
@@ -178,8 +185,8 @@ class gameScene extends Phaser.Scene
                         this.selectedMachine = building;
                         building.upgradeMenu.setVisible(true);
                     }
-                    
-                    if(building.building.anims)
+
+                    if (building.building.anims)
                     {
                         building.building.anims.play(building.animationString, true, building.lastFrame);
                     }
@@ -208,21 +215,21 @@ class gameScene extends Phaser.Scene
                     }
                 }
             }
-            
-            for(var i = 0; i < this.currencyManager.allMachines.length; i++)
+
+            for (var i = 0; i < this.currencyManager.allMachines.length; i++)
             {
                 let cm = this.currencyManager;
                 let machine = cm.allMachines[i];
-                
-                if(machine.hasManager && !machine.incomeAdded)
+
+                if (machine.hasManager && !machine.incomeAdded)
                 {
                     cm.totalIncomePerTick += machine.incomePerTick;
                     machine.incomeAdded = true;
                 }
 
-                if(machine.sold)
+                if (machine.sold)
                 {
-                    if(machine.hasManager)
+                    if (machine.hasManager)
                     {
                         cm.totalIncomePerTick -= machine.incomePerTick;
                     }
@@ -239,13 +246,18 @@ class gameScene extends Phaser.Scene
         this.buildingLocations = [];
 
         var bc = this.buildConfig;
-        for (var x = 0; x < 10; x++)
+        for (var x = 0; x < this.buildConfig.gridWidth; x++)
         {
-            for (var y = 0; y < 10; y++)
+            for (var y = 0; y < this.buildConfig.gridHeight; y++)
             {
-                this.buildingLocations[x + (y * 10)] = new Building(this, x * bc.horizontalMargin - ((bc.horizontalMargin + bc.buildWidth) * bc.gridWidth / 2),
-                y * bc.horizontalMargin - ((bc.verticalMargin + bc.buildHeight) * bc.gridHeight / 2),
+                this.buildingLocations[x + (y * this.buildConfig.gridWidth)] = new Building(this, x * bc.horizontalMargin - ((bc.horizontalMargin + bc.buildWidth) * bc.gridWidth / 3),
+                y * bc.horizontalMargin - ((bc.verticalMargin + bc.buildHeight) * bc.gridHeight / 3),
                 bc.buildWidth, bc.buildHeight, {x: x, y: y}, "buildSpace");
+
+                if(x < 4 || y < 5 || x > 6 || y > 6)
+                {
+                    this.buildingLocations[x + (y * this.buildConfig.gridWidth)].lockBuilding();
+                }
             }
         }
     }
@@ -332,7 +344,9 @@ class gameScene extends Phaser.Scene
     numCompressor(money)
     {
         var numberTags = ["","k", "m", "b", "t", "q", "qn", "s", "spt"];
+        
         money = money.toString();
+        
         var len = money.length;
         var lenDiv = Math.floor(len / 3);
         var lenMod = len % 3;
