@@ -84,9 +84,9 @@ class gameScene extends Phaser.Scene
 
         this.machineIncome =
         {
-            handGen: 500,
+            handGen: 15,
             solarPanel: 55,
-            windTurbine: 10000,
+            windTurbine: 230,
             geoTer: 500,
             nuclearPlant: 1000,
             hamsterWheel: 470,
